@@ -4,7 +4,7 @@
 
 -----------------
 
-The goal of this project is to provide a simple, extensible GPU accelerated QUBO Solver for fast debugging.
+The goal of this project is to provide a simple, extensible GPU accelerated QUBO Solver for fast debugging of problem definitions.
 
 ## Prerequisits
 
