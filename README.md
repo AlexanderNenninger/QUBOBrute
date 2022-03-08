@@ -23,7 +23,7 @@ In particular, you need
 
 ## Usage
 
-    from qubobrute.core import *
+    from qubobrute import *
     from pyqubo import Array
 
     nbits = 30
