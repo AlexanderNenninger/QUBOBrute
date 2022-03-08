@@ -1,12 +1,25 @@
-# QUBOBrute - GPU Accelerated Brute Force Solver for Quadratic Binary Optimization Problems
+# QUBOBrute
+
+*GPU Accelerated Brute Force Solver for Quadratic Binary Optimization Problems.*
+
+-----------------
+
+The goal of this project is to provide a simple, extensible GPU accelerated QUBO Solver for fast debugging.
 
 ## Prerequisits
 
-This code is tested on an NVIDIA RTX 2060 running on Ubuntu 20.04 LTS. With 6GB of VRAM, the GPU can solve qubos of up to 30 variables.
+This project is tested on an NVIDIA RTX 2060 running on Ubuntu 20.04 LTS. With 6GB of VRAM, the GPU can solve qubos of up to 30 variables.
 
 ## Installation
 
-    `pip install -r requirements.txt`
+`conda install --file condarequirements.txt`
+
+In particular, you need
+
++ `numba`
++ `pyqubo`
++ `cudatoolkit`
++ `scipy`
 
 ## Usage
 
