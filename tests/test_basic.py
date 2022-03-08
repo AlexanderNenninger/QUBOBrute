@@ -14,7 +14,7 @@ class BasicTest(unittest.TestCase):
         H = (4 * s1 + 2 * s2 + 7 * s3 + s4) ** 2
         self.model = H.compile()
         self.qubo, self.offset = self.model.to_qubo(index_label=True)
-        self.q = to_mat((self.qubo, self.offset))
+        self.q = to_mat(self.qubo)
 
         self.true_solution = np.array(
             [
@@ -39,7 +39,7 @@ class BasicTest(unittest.TestCase):
         )
 
     def test_basic(self):
-        qubo = self.model.to_qubo(index_label=True)
+        qubo, offset = self.model.to_qubo(index_label=True)
         q = to_mat(qubo)
 
         truth = np.array(

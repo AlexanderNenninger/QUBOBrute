@@ -31,5 +31,5 @@ In particular, you need
     H = (np.arange(nbits) @ x - 12) ** 2
     model = H.compile()
     qubo, offset = model.to_qubo(index_label=True)
-    q = to_mat((qubo, offset))
+    q = to_mat(qubo)
     solutions = solve_gpu(q, offset)

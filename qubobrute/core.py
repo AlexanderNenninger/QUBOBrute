@@ -8,7 +8,7 @@ from numba import cuda
 Qubo = Dict[Tuple[int, int], float]
 
 
-def to_mat(qubo: Tuple[Qubo, float]) -> np.ndarray:
+def to_mat(qubo: Qubo) -> np.ndarray:
     """Turns a QUBO as
 
     Args:
@@ -20,15 +20,14 @@ def to_mat(qubo: Tuple[Qubo, float]) -> np.ndarray:
     Returns:
         np.ndarray: QUBO as numpy matrix
     """
-    Q, _ = qubo
-    if len(Q) > 0:
-        matsize = max(max(Q)) + 1
+    if len(qubo) > 0:
+        matsize = max(max(qubo)) + 1
     else:
         raise ValueError("Provide at least some data.")
 
     w = np.zeros((matsize, matsize), dtype=np.float32)
-    for idx in Q:
-        w[idx[0], idx[1]] = Q[idx]
+    for idx in qubo:
+        w[idx[0], idx[1]] = qubo[idx]
 
     return w
 
