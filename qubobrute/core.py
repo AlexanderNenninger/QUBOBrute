@@ -9,7 +9,8 @@ Qubo = Dict[Tuple[int, int], float]
 
 
 def to_mat(qubo: Qubo) -> np.ndarray:
-    """Turns a QUBO as
+    """Turns a QUBO dictionary representation into
+    a matrix representation. 
 
     Args:
         qubo (Tuple[Qubo, float]): QUBO as returned by PyQubo
@@ -54,7 +55,7 @@ def bits(n: int, nbits: int):
 
 @nb.njit(parallel=True)
 def solve_cpu(Q, c):
-    """Calculate the value of all to the QUBO H(x) = x^T Q x + c in parallel on the CPU.
+    """Calculate all possible values of the QUBO H(x) = x^T Q x + c in parallel on the CPU.
 
     Args:
         Q (np.ndarray)
