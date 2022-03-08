@@ -1,9 +1,8 @@
 import unittest
 
-import numba as nb
 import numpy as np
 from pyqubo import Array, Spin
-from qubobrute.core import *
+from qubobrute import *
 
 
 class BasicTest(unittest.TestCase):
@@ -70,4 +69,3 @@ class BasicTest(unittest.TestCase):
         qubo, offset = model.to_qubo(index_label=True)
         q = to_mat((qubo, offset))
         solutions = solve_gpu(q, offset)
-        pass
