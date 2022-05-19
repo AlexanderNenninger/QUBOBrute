@@ -1,5 +1,4 @@
-from asyncio import Queue
-from typing import Callable, Dict, Tuple
+from typing import Callable, Dict, Tuple, Union
 
 import numba as nb
 import numpy as np
@@ -10,7 +9,7 @@ Qubo = Dict[Tuple[int, int], float]
 
 def to_mat(qubo: Qubo) -> np.ndarray:
     """Turns a QUBO dictionary representation into
-    a matrix representation. 
+    a matrix representation.
 
     Args:
         qubo (Tuple[Qubo, float]): QUBO as returned by PyQubo
@@ -34,7 +33,7 @@ def to_mat(qubo: Qubo) -> np.ndarray:
 
 
 @nb.njit
-def bits(n: int, nbits: int):
+def bits(n: Union[int, np.intp], nbits: int) -> np.ndarray:
     """Turn n into an array of float32.
 
     Args:
@@ -75,8 +74,6 @@ def solve_cpu(Q, c):
 
 
 # CUDA Code starts here
-
-
 @cuda.jit(device=True)
 def cubits(n, xs):
     i = 0
@@ -107,7 +104,7 @@ def solve_gpu(Q: np.ndarray, c: np.float32) -> np.ndarray:
         c (np.float32): energy offset
 
     Returns:
-        v (np.ndarray): Alll possible values, H can take in enumerated order. Suppose  argmin(v) = i, then bits(i, q.shape[0]) minimizes H.
+        v (np.ndarray): All possible energy values H can take in enumerated order. Suppose  argmin(v) = i, then bits(i, q.shape[0]) minimizes H.
     """
     assert (
         Q.ndim == 2
@@ -118,19 +115,21 @@ def solve_gpu(Q: np.ndarray, c: np.float32) -> np.ndarray:
     N = 2**nbits
 
     @cuda.jit()
-    def kernel(q, c, solutions):
+    def kernel(q, offset, solutions):
         tx = cuda.threadIdx.x
         ty = cuda.blockIdx.x
         bw = cuda.blockDim.x
         idx = tx + ty * bw  # type: ignore
-        xs = cuda.local.array(nbits, dtype=nb.u1)
+        xs = cuda.local.array(nbits, dtype=nb.u1)  # type: ignore
         cubits(idx, xs)
-        if idx < solutions.size:
-            solutions[idx] = qnorm(q, xs) + c
+        if 0 <= idx < solutions.size:
+            solutions[idx] = qnorm(q, xs) + offset
 
     solutions = cuda.device_array(N, dtype=np.float16)
     threadsperblock = 256
     blockspergrid = (solutions.size + (threadsperblock - 1)) // threadsperblock
-    kernel[blockspergrid, threadsperblock](Q, c, solutions)
+
+    Q = cuda.to_device(Q)
+    kernel[blockspergrid, threadsperblock](Q, c, solutions)  # type: ignore
 
     return solutions.copy_to_host()
