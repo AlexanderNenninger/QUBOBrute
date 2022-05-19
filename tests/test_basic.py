@@ -62,10 +62,61 @@ class BasicTest(unittest.TestCase):
         self.assertTrue(np.allclose(solutions, self.true_solution))
 
     def test_large(self):
-        nbits = 30
+        nbits = 25
         x = Array.create("x", shape=(nbits,), vartype="BINARY")
         H = (np.arange(nbits) @ x - 12) ** 2
         model = H.compile()
         qubo, offset = model.to_qubo(index_label=True)
-        q = to_mat((qubo, offset))
-        solutions = solve_gpu(q, offset)
+        q = to_mat(qubo)
+        energies = solve_gpu(q, offset)
+
+        self.assertAlmostEqual(int(np.log2(len(energies))), nbits)
+        self.assertAlmostEqual(energies.min(), 0)
+
+
+class TestSimulatedAnnealing(unittest.TestCase):
+    def setUp(self) -> None:
+        s1, s2, s3, s4 = Spin("s1"), Spin("s2"), Spin("s3"), Spin("s4")
+        H = (4 * s1 + 2 * s2 + 7 * s3 + s4) ** 2
+        self.model = H.compile()
+        self.qubo, self.offset = self.model.to_qubo(index_label=True)
+        self.q = to_mat(self.qubo)
+
+        self.true_solution = np.array(
+            [
+                196.0,
+                36.0,
+                100.0,
+                4.0,
+                0.0,
+                64.0,
+                16.0,
+                144.0,
+                144.0,
+                16.0,
+                64.0,
+                0.0,
+                4.0,
+                100.0,
+                36.0,
+                196.0,
+            ],
+            dtype=np.float32,
+        )
+
+    def test_simulated_annealing(self):
+        import warnings
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            energies, solutions = simulate_annealing(
+                self.q,
+                self.offset,
+                n_iter=100,
+                n_samples=100,
+                temperature=1,
+                cooling_rate=0.99,
+            )
+        min_energy = np.min(energies)
+        best = solutions[energies.argmin()]
+        self.assertAlmostEqual(min_energy, 0.0)
