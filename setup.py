@@ -19,7 +19,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/AlexanderNenninger/QUBOBrute",
     author="Alexander Nenninger",
-    author_email="alexander.nenninger.devoutlook.com",
+    author_email="alexander.nenninger.dev@outlook.com",
     license="MIT",
     classifiers=[
         "License :: OSI Approved :: MIT License",
