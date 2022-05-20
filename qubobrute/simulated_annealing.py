@@ -153,7 +153,7 @@ def simulate_annealing_gpu(
     samples = cuda.to_device(samples)
 
     energies = np.full(n_samples, np.inf, dtype=np.float32)
-    energies = cuda.to_device(energies)
+    energies_cu = cuda.to_device(energies)
 
     Q = Q.astype(np.float32)
     Q = cuda.to_device(Q)
@@ -172,6 +172,12 @@ def simulate_annealing_gpu(
     blockspergrid = (n_samples + (threadsperblock - 1)) // threadsperblock
 
     rng_states = create_xoroshiro128p_states(blockspergrid * threadsperblock, seed=0)
-    simulate_annealing_kernel[blockspergrid, threadsperblock](rng_states, samples, energies, Q, temperatures)  # type: ignore
+    simulate_annealing_kernel[blockspergrid, threadsperblock](rng_states, samples, energies_cu, Q, temperatures)  # type: ignore
 
-    return energies.copy_to_host(), samples.copy_to_host()  # type: ignore
+    energies = energies_cu.copy_to_host()
+    assert isinstance(energies, np.ndarray)
+
+    samples = samples.copy_to_host()
+    assert isinstance(samples, np.ndarray)
+
+    return energies, samples
