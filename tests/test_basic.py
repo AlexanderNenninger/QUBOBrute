@@ -1,4 +1,5 @@
 import unittest
+import warnings
 
 import numpy as np
 from pyqubo import Array, Spin
@@ -120,3 +121,49 @@ class TestSimulatedAnnealing(unittest.TestCase):
         min_energy = np.min(energies)
         best = solutions[energies.argmin()]
         self.assertAlmostEqual(min_energy, 0.0)
+
+    def test_cuda_available(self):
+        from numba import cuda
+
+        self.assertTrue(cuda.is_available())
+
+    def test_simulated_annealing_gpu(self):
+        import warnings
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            energies, solutions = simulate_annealing_gpu(
+                self.q,
+                self.offset,
+                n_iter=1000,
+                n_samples=100_000,
+                temperature=10,
+                cooling_rate=0.99,
+            )
+
+        min_energy = np.min(energies)
+        best = solutions[energies.argmin()]
+        self.assertAlmostEqual(min_energy, 0.0)
+
+    def test_large(self):
+        nbits = 1_000
+        q = np.random.standard_normal((nbits, nbits))
+        offset = 0
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            energies, solutions = simulate_annealing_gpu(
+                q,
+                offset,
+                n_iter=100,
+                n_samples=100_000,
+                temperature=10,
+                cooling_rate=0.99,
+            )
+
+        min_energy = np.min(energies)
+        best = solutions[energies.argmin()]
+        self.assertLess(min_energy, np.inf)
+
+
+if __name__ == "__main__":
+    unittest.main()

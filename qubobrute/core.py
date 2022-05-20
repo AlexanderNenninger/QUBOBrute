@@ -32,7 +32,7 @@ def to_mat(qubo: Qubo) -> np.ndarray:
     return w
 
 
-@nb.njit
+@nb.njit(fastmath=True)
 def bits(n: Union[int, np.intp], nbits: int) -> np.ndarray:
     """Turn n into an array of float32.
 
@@ -52,7 +52,7 @@ def bits(n: Union[int, np.intp], nbits: int) -> np.ndarray:
     return bits
 
 
-@nb.njit(parallel=True)
+@nb.njit(parallel=True, fastmath=True)
 def solve_cpu(Q, c):
     """Calculate all possible values of the QUBO H(x) = x^T Q x + c in parallel on the CPU.
 
@@ -85,6 +85,15 @@ def cubits(n, xs):
 
 @cuda.jit(device=True)
 def qnorm(q, x):
+    """Calculate x^T q x inside the CUDA kernel
+
+    Args:
+        q (_type_): 2d array of size nbits x nbits
+        x (_type_): 1d array of size nbits
+
+    Returns:
+        float: x^T q x
+    """
     n = q.shape[0]
     out = 0
     for i in range(n):
@@ -96,6 +105,20 @@ def qnorm(q, x):
     return out
 
 
+@cuda.jit(device=True)
+def copy_slice(a, b, start, end):
+    """Copy values inside a kernel from one array to another.
+
+    Args:
+        a: source array
+        b: target array
+        start (_type_): start index
+        end (_type_): end index
+    """
+    for i in range(start, end):
+        b[i] = a[i]
+
+
 def solve_gpu(Q: np.ndarray, c: np.float32) -> np.ndarray:
     """Solve QUBO H(x) = x^T Q x + c on a GPU.
 
@@ -104,7 +127,8 @@ def solve_gpu(Q: np.ndarray, c: np.float32) -> np.ndarray:
         c (np.float32): energy offset
 
     Returns:
-        v (np.ndarray): All possible energy values H can take in enumerated order. Suppose  argmin(v) = i, then bits(i, q.shape[0]) minimizes H.
+        v (np.ndarray): All possible energy values H can take in enumerated order.
+        Suppose  argmin(v) = i, then bits(i, q.shape[0]) minimizes H.
     """
     assert (
         Q.ndim == 2
@@ -115,7 +139,7 @@ def solve_gpu(Q: np.ndarray, c: np.float32) -> np.ndarray:
     N = 2**nbits
 
     @cuda.jit()
-    def kernel(q, offset, solutions):
+    def kernel(q, c, solutions):
         tx = cuda.threadIdx.x
         ty = cuda.blockIdx.x
         bw = cuda.blockDim.x
@@ -123,7 +147,7 @@ def solve_gpu(Q: np.ndarray, c: np.float32) -> np.ndarray:
         xs = cuda.local.array(nbits, dtype=nb.u1)  # type: ignore
         cubits(idx, xs)
         if 0 <= idx < solutions.size:
-            solutions[idx] = qnorm(q, xs) + offset
+            solutions[idx] = qnorm(q, xs) + c
 
     solutions = cuda.device_array(N, dtype=np.float16)
     threadsperblock = 256
