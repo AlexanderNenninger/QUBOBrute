@@ -1,6 +1,6 @@
 # QUBOBrute
 
-*GPU Accelerated Brute Force Solver for Quadratic Binary Optimization Problems.*
+*GPU Accelerated Solver for Quadratic Binary Optimization Problems.*
 
 -----------------
 
@@ -8,7 +8,14 @@ The goal of this project is to provide a simple, extensible GPU accelerated QUBO
 
 ## Prerequisits
 
-This project is tested on an NVIDIA RTX 2060 running on Ubuntu 20.04 LTS. With 6GB of VRAM, the GPU can solve qubos of up to 30 variables.
+This project is tested on an NVIDIA RTX 2060 running on Ubuntu 20.04 LTS.
+
+## Features
+
+ + Bruteforce solver running in parallel on the CPU.
+ + Bruteforce solver running in parallel on an NVidia GPU.
+ + Fast simulated annealing solver running in parallel threads on the CPU.
+ + Blazingly fast simulated annealing solver running in parallel threads on the GPU.
 
 ## Installation
 
@@ -32,4 +39,6 @@ In particular, you need
     model = H.compile()
     qubo, offset = model.to_qubo(index_label=True)
     q = to_mat(qubo)
-    solutions = solve_gpu(q, offset)
+    energies = solve_gpu(q, offset)
+    
+Further examples can be found in the `examples` directory.
