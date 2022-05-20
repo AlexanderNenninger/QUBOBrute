@@ -1,3 +1,4 @@
+import warnings
 from math import exp
 from typing import Tuple
 
@@ -119,7 +120,7 @@ def simulate_annealing_gpu(
         if sample_id < n_samples:  # type: ignore
 
             for i in range(n_iter):
-                new_sample = cuda.local.array(n, dtype=np.int8)
+                new_sample = cuda.local.array(n, dtype=np.float32)  # type: ignore
                 copy_slice(samples[sample_id], new_sample, 0, n)
 
                 rand_idx_f = xoroshiro128p_uniform_float32(rng_states, sample_id)
@@ -150,18 +151,26 @@ def simulate_annealing_gpu(
     samples = np.round(np.random.rand(n_samples, n).astype(np.float32))
     samples = cuda.to_device(samples)
 
-    energies = np.zeros(n_samples, dtype=np.float32)
+    energies = np.full(n_samples, np.inf, dtype=np.float32)
     energies = cuda.to_device(energies)
 
+    Q = Q.astype(np.float32)
     Q = cuda.to_device(Q)
 
-    temperatures = cuda.device_array(n_samples, dtype=np.float32)
-    temperatures[:] = temperature
+    # Numba complains about inefficient Grid Size. But it is not a problem.
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        temperatures = cuda.device_array(n_samples, dtype=np.float32)
+        temperatures[:] = temperature
 
-    threadsperblock = 256
+    # Saturate GPU SMs but don't overflow thread count
+    threadsperblock = min(
+        n_samples // 2 // cuda.get_current_device().MULTIPROCESSOR_COUNT, 256
+    )
+
     blockspergrid = (n_samples + (threadsperblock - 1)) // threadsperblock
 
     rng_states = create_xoroshiro128p_states(blockspergrid * threadsperblock, seed=0)
     simulate_annealing_kernel[blockspergrid, threadsperblock](rng_states, samples, energies, Q, temperatures)  # type: ignore
 
-    return energies.copy_to_host(), samples.copy_to_host()
+    return energies.copy_to_host(), samples.copy_to_host()  # type: ignore
