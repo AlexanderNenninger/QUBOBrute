@@ -8,7 +8,7 @@ The goal of this project is to provide a simple, extensible GPU accelerated QUBO
 
 ## Prerequisits
 
-This project is tested on an NVIDIA RTX 2060 running on Ubuntu 20.04 LTS.
+You will need a CUDA capable GPU. This project is tested on an NVIDIA RTX 2060 running on Ubuntu 20.04 LTS.
 
 ## Features
 
