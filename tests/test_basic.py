@@ -120,3 +120,42 @@ class TestSimulatedAnnealing(unittest.TestCase):
         min_energy = np.min(energies)
         best = solutions[energies.argmin()]
         self.assertAlmostEqual(min_energy, 0.0)
+
+    def test_simulated_annealing_gpu(self):
+        import warnings
+
+        with warnings.catch_warnings():
+            warnings.simplefilter("error")
+            energies, solutions = simulate_annealing_gpu(
+                self.q,
+                self.offset,
+                n_iter=1000,
+                n_samples=1_000_000,
+                temperature=10,
+                cooling_rate=0.99,
+            )
+
+        min_energy = np.min(energies)
+        best = solutions[energies.argmin()]
+        self.assertAlmostEqual(min_energy, 0.0)
+
+    def test_large(self):
+        nbits = 100_000
+        x = Array.create("x", shape=(nbits,), vartype="BINARY")
+        H = (np.arange(nbits) @ x - nbits // 2) ** 2
+        model = H.compile()
+        qubo, offset = model.to_qubo(index_label=True)
+        q = to_mat(qubo)
+
+        energies, solutions = simulate_annealing_gpu(
+            q,
+            offset,
+            n_iter=1000,
+            n_samples=10_000,
+            temperature=10,
+            cooling_rate=0.99,
+        )
+
+        min_energy = np.min(energies)
+        best = solutions[energies.argmin()]
+        self.assertAlmostEqual(min_energy, 0.0)
