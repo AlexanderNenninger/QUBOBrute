@@ -89,7 +89,7 @@ def simulate_annealing_gpu(
     temperature: float,
     cooling_rate: float,
 ) -> Tuple[np.ndarray, np.ndarray]:
-    """Simulate annealing on the GPU. This functions works very well, if the QUBO is small,
+    """Simulate annealing on the GPU. This functions works very well if the QUBO is small,
     but good solutions are required.
 
     Args:
