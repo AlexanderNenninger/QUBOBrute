@@ -8,7 +8,7 @@ The goal of this project is to provide a simple, extensible GPU accelerated QUBO
 
 ## Prerequisits
 
-For using the GPU solvers you will need a CUDA capable GPU. This project is tested on an NVIDIA RTX 2060 running on Ubuntu 20.04 LTS. The CPU solvers work on any old Laptop, but of course the faster the better (Looking at you, EPYC 7742...)
+For using the GPU solvers you will need a CUDA capable GPU. This project is tested on an NVIDIA RTX 2060 running on Ubuntu 20.04 LTS. The CPU solvers work on any old Laptop, but of course the faster the better (Looking at you, EPYC 7742...).
 
 ## Features
 
