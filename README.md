@@ -13,7 +13,7 @@ This project is tested on an NVIDIA RTX 2060 running on Ubuntu 20.04 LTS.
 ## Features
 
  + Bruteforce solver running in parallel on the CPU.
- + Bruteforce solver running in parallel on an NVidia GPU.
+ + Bruteforce solver running in parallel on an Nvidia GPU.
  + Fast simulated annealing solver running in parallel threads on the CPU.
  + Blazingly fast simulated annealing solver running in parallel threads on the GPU.
 
