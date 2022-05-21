@@ -27,5 +27,5 @@ setup(
         "Programming Language :: Python :: 3.10",
     ],
     packages=["qubobrute"],
-    install_requires=["numpy", "numba", "cudatoolkit", "pyqubo", "scipy"],
+    install_requires=["numpy", "numba", "cudatoolkit", "pyqubo", "scipy", "cupy"],
 )
