@@ -27,6 +27,7 @@ In particular, you need
 + `pyqubo`
 + `cudatoolkit`
 + `scipy`
++ `cupy`
 
 ## Usage
 
