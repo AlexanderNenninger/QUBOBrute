@@ -146,7 +146,7 @@ class TestSimulatedAnnealing(unittest.TestCase):
         self.assertAlmostEqual(min_energy, 0.0)
 
     def test_large(self):
-        nbits = 30_000
+        nbits = 10_000
         q = np.random.standard_normal((nbits, nbits))
         offset = 0
         with warnings.catch_warnings():
