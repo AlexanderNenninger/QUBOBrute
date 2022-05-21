@@ -146,16 +146,16 @@ class TestSimulatedAnnealing(unittest.TestCase):
         self.assertAlmostEqual(min_energy, 0.0)
 
     def test_large(self):
-        nbits = 1_000
+        nbits = 10_000
         q = np.random.standard_normal((nbits, nbits))
         offset = 0
         with warnings.catch_warnings():
             warnings.simplefilter("error")
-            energies, solutions = simulate_annealing_gpu(
+            energies, solutions = simulate_annealing_large_gpu(
                 q,
                 offset,
                 n_iter=100,
-                n_samples=100_000,
+                n_samples=1000,
                 temperature=10,
                 cooling_rate=0.99,
             )
