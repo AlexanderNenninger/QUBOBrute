@@ -75,7 +75,7 @@ def solve_cpu(Q, c):
 
 # CUDA Code starts here
 @cuda.jit(device=True)
-def cubits(n, xs):
+def cu_bits(n, xs):
     i = 0
     while n > 0:
         n, rem = n // 2, n % 2
@@ -84,7 +84,7 @@ def cubits(n, xs):
 
 
 @cuda.jit(device=True)
-def qnorm(q, x):
+def cu_qnorm(q, x):
     """Calculate x^T q x inside the CUDA kernel
 
     Args:
@@ -145,9 +145,9 @@ def solve_gpu(Q: np.ndarray, c: np.float32) -> np.ndarray:
         bw = cuda.blockDim.x
         idx = tx + ty * bw  # type: ignore
         xs = cuda.local.array(nbits, dtype=nb.u1)  # type: ignore
-        cubits(idx, xs)
+        cu_bits(idx, xs)
         if 0 <= idx < solutions.size:
-            solutions[idx] = qnorm(q, xs) + c
+            solutions[idx] = cu_qnorm(q, xs) + c
 
     solutions = cuda.device_array(N, dtype=np.float16)
     threadsperblock = 256

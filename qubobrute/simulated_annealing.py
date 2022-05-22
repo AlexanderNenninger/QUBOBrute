@@ -8,7 +8,7 @@ import numpy as np
 from numba import cuda
 from numba.cuda.random import create_xoroshiro128p_states, xoroshiro128p_uniform_float32
 
-from .core import copy_slice, qnorm
+from .core import copy_slice, cu_qnorm
 
 
 @nb.njit(fastmath=True)
@@ -132,7 +132,7 @@ def simulate_annealing_gpu(
 
                 new_sample[rand_idx] = not new_sample[rand_idx]  # type: ignore
 
-                new_energy = qnorm(Q, new_sample) + c
+                new_energy = cu_qnorm(Q, new_sample) + c
 
                 if new_energy < energies[sample_id]:
                     copy_slice(new_sample, samples[sample_id], 0, n)
