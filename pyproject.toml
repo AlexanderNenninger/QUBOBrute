@@ -1,3 +1,45 @@
+[project]
+name = "QuboBrute"
+
+version = "0.0.1"
+
+description = "QuboBrute is a collection of really fast Numba/CUDA accelerated Qubo solvers. The name stems from a simple brute-force solver that works on QUBOs with up to ~30 binary variables, depending on the memory size of your NVIDIA GPU. The main advantage of this package compared to other implementations is speed and simplicity. We forego any precompilations and rely on Numba's proven LLVM backend for JIT. NOTE: For using the CUDA functionality install cudatoolkit and cupy using conda."
+
+requires-python = ">=3.8,<3.11"
+
+license = "MIT"
+
+authors = [
+    { name = "Alexander Nenninger", email = "alexander.nenninger.dev@outlook.com" },
+]
+
+keywords = ["Qubo", "Ising", "GPU", "CUDA"]
+
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: GPU :: NVIDIA CUDA",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+]
+dependencies = ["numba", "scipy"]
+
+[project.urls]
+Documentation = "https://github.com/AlexanderNenninger/QUBOBrute"
+"Source code" = "https://github.com/AlexanderNenninger/QUBOBrute"
+
+
+[project.optional-dependencies]
+examples = ["ipykernel", "matplotlib", "pyqubo"]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch]
+
+[tool.hatch.build]
+sources = ["qubobrute"]
+
 [tool.pyright]
 
-exclude=["./qubobrute/simulate_annealing.py"]
+exclude = ["./qubobrute/simulate_annealing.py"]

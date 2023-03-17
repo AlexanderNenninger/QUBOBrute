@@ -122,7 +122,6 @@ def simulate_annealing_gpu(
         """
         sample_id = cuda.grid(1)  # type: ignore # noqa
         if sample_id < n_samples:  # type: ignore
-
             for _ in range(n_iter):
                 new_sample = cuda.local.array(n, dtype=np.float32)  # type: ignore
                 copy_slice(samples[sample_id], new_sample, 0, n)
